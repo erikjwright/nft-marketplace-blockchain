@@ -55,23 +55,10 @@ contract Market is
 
         _safeMint(msg.sender, _tokenId);
         _setTokenURI(_tokenId, uri);
+
+        approve(address(this), _tokenId);
+
         list(_price, _tokenId);
-
-        approve(address(this), _tokenId);
-    }
-
-    function list(uint256 _price, uint256 _tokenId) public onlyOwner(_tokenId) {
-        Entity memory entity = tokenIdToEntity[_tokenId];
-
-        entity = Entity({
-            price: _price,
-            owner: payable(msg.sender),
-            sale: true
-        });
-
-        tokenIdToEntity[_tokenId] = entity;
-
-        approve(address(this), _tokenId);
     }
 
     function buy(uint256 _tokenId) public payable nonReentrant {
@@ -85,34 +72,32 @@ contract Market is
             _tokenId
         );
 
-        entity = Entity({
+        tokenIdToEntity[_tokenId] = Entity({
             price: entity.price,
             owner: payable(msg.sender),
             sale: false
         });
-
-        tokenIdToEntity[_tokenId] = entity;
     }
 
-    function entitiesAll() public view returns (Entity[] memory) {
-        Entity[] memory entities = new Entity[](_tokenIdCounter.current());
+    function list(uint256 _price, uint256 _tokenId) public onlyOwner(_tokenId) {
+        tokenIdToEntity[_tokenId] = Entity({
+            price: _price,
+            owner: payable(msg.sender),
+            sale: true
+        });
 
-        for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
-            entities[i].owner = tokenIdToEntity[i].owner;
-            entities[i].price = tokenIdToEntity[i].price;
-            entities[i].sale = tokenIdToEntity[i].sale;
-        }
-
-        return entities;
+        approve(address(this), _tokenId);
     }
 
     function entitiesForSale() public view returns (Entity[] memory) {
+        require(_tokenIdCounter.current() != 0, "Must have tokens");
+
         Entity[] memory entities = new Entity[](_tokenIdCounter.current());
 
         for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
-            entities[i].owner = tokenIdToEntity[i].owner;
-            entities[i].price = tokenIdToEntity[i].price;
-            entities[i].sale = tokenIdToEntity[i].sale;
+            if (tokenIdToEntity[i].sale == true) {
+                entities[i] = tokenIdToEntity[i];
+            }
         }
 
         return entities;

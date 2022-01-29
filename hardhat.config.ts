@@ -34,7 +34,7 @@ const config: HardhatUserConfig = {
   },
   defaultNetwork: 'hardhat',
   networks: {
-    hardhat: { chainId: 1337 },
+    hardhat: {},
     //  mumbai: {
     //    url: "https://rpc-mumbai.maticvigil.com",
     //    accounts: [privateKey]

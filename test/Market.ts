@@ -67,7 +67,16 @@ describe('Market', function () {
     console.log(allEntities);
   });
 
-  it('Should sell', async function () {
+  it('Should return all entities for sale', async function () {
+    const marketWithSigner1 = market.connect(signer1);
+
+    const minted1 = await marketWithSigner1.safeMint('1', ethers.utils.parseEther('0.001'));
+    await minted1.wait();
+
+    console.log(await market.entitiesForSale());
+  });
+
+  it.skip('Should sell', async function () {
     const marketWithSigner1 = market.connect(signer1);
 
     const minted1 = await marketWithSigner1.safeMint('1', ethers.utils.parseEther('0.001'));
@@ -115,7 +124,11 @@ describe('Market', function () {
 
     const tokenURIs = await Promise.all(tokens.map(async token => await market.tokenURI(token)));
 
-    expect(tokenURIs).to.have.members(['https://nft.xyz/ipfs/1', 'https://nft.xyz/ipfs/2', 'https://nft.xyz/ipfs/4']);
+    expect(tokenURIs).to.have.members([
+      'https://nft.xyz/ipfs/1',
+      'https://nft.xyz/ipfs/2',
+      'https://nft.xyz/ipfs/4',
+    ]);
 
     const allEntities = await market.entitiesAll();
 
