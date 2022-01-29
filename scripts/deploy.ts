@@ -13,11 +13,17 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
+  const minter = process.env.MINTER_ADDRESS;
+
+  if (!minter) throw new Error('No minter');
+
   // We get the contract to deploy
   const Market = await ethers.getContractFactory('Market');
   const market = await Market.deploy();
 
   await market.deployed();
+
+  await market.grantRole(ethers.utils.id('MINTER_ROLE'), minter);
 
   console.log('Market deployed to:', market.address);
 }
